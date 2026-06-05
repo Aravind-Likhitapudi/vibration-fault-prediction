@@ -76,6 +76,7 @@ with center:
 # =========================
 # Prediction
 # =========================
+
 if predict_btn:
 
     values = [
@@ -85,9 +86,15 @@ if predict_btn:
         h4, v4, a4
     ]
 
+    # Prevent empty prediction
+    if sum(values) == 0:
+        st.warning("Please enter vibration values.")
+        st.stop()
+
     # Machine Learning
     prediction = clf.predict([values])[0]
-    probability = max(clf.predict_proba([values])[0]) * 100
+    probabilities = clf.predict_proba([values])[0]
+    probability = max(probabilities) * 100
 
     # Rule Based
     rule_results = rule_based_predict(values)
@@ -96,14 +103,48 @@ if predict_btn:
 
     st.divider()
 
+    # =========================
+    # Rule Based Result
+    # =========================
     st.subheader("Rule-Based Prediction")
     st.write(f"**Fault :** {rule_fault}")
     st.write(f"**Score :** {rule_score:.1f}%")
 
     st.divider()
 
+    # =========================
+    # ML Result
+    # =========================
     st.subheader("Machine Learning Prediction")
     st.write(f"**Fault :** {prediction}")
     st.write(f"**Confidence :** {probability:.2f}%")
 
     st.divider()
+
+    # =========================
+    # All Fault Rankings
+    # =========================
+    with st.expander("📊 View All Fault Rankings"):
+
+        # Get class names from model
+        classes = clf.classes_
+
+        ranking = list(zip(classes, probabilities))
+        ranking.sort(key=lambda x: x[1], reverse=True)
+
+        for idx, (fault, prob) in enumerate(ranking, start=1):
+
+            percent = prob * 100
+
+            bar = "█" * min(int(percent / 2), 50)
+
+            if idx == 1:
+                st.write(
+                    f"**{idx}. {fault} - {percent:.1f}%** {bar} ◀"
+
+                )
+            else:
+                st.write(
+                    f"{idx}. {fault} - {percent:.1f}% {bar}"
+
+                )
