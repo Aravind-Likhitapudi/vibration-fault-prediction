@@ -109,6 +109,12 @@ if predict_btn:
     st.subheader("Rule-Based Prediction")
     st.write(f"**Fault :** {rule_fault}")
     st.write(f"**Score :** {rule_score:.1f}%")
+    with st.expander("📋 View Rule-Based Rankings"):
+        for idx, (fault, score) in enumerate(rule_results, start=1):
+            if idx == 1:
+                st.write(f"**{idx}. {fault} - {score:.1f}%** ◀")
+            else:
+                st.write(f"{idx}. {fault} - {score:.1f}%")
 
     st.divider()
 
@@ -124,7 +130,7 @@ if predict_btn:
     # =========================
     # All Fault Rankings
     # =========================
-    with st.expander("📊 View All Fault Rankings"):
+    with st.expander("📊 View Machine Learning Rankings"):
 
         classes = clf.classes_
 
